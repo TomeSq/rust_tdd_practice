@@ -1,0 +1,88 @@
+{
+  // tomlの設定
+  "[toml]": {
+    "editor.defaultFormatter": "tamasfe.even-better-toml",
+    "editor.formatOnSave": true
+  },
+  //===================
+  // rust設定
+  "[rust]": {
+    "editor.defaultFormatter": "rust-lang.rust-analyzer",
+    "editor.formatOnSave": true,
+    //デフォルトでは型表示を表示しない。Ctrl-Altで表示する
+    "editor.inlayHints.enabled": "offUnlessPressed",
+
+    // Rustファイル固有の設定
+    "editor.semanticHighlighting.enabled": true,
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.rulers": [100] // .rustfmt.tomlのmax_widthと連携
+  },
+  "rust-analyzer.checkOnSave": true,
+  "rust-analyzer.check.command": "clippy",
+
+  // バグ防止・効率化のためのrust-analyzer設定
+  "rust-analyzer.check.allTargets": true,
+
+  // コード補完の強化（タイピング効率向上）
+  "rust-analyzer.completion.autoimport.enable": true,
+
+  // インポート管理（構造化サポート）
+  "rust-analyzer.imports.granularity.group": "module",
+  "rust-analyzer.imports.granularity.enforce": true,
+
+  // テスト重視のためのCodeLens設定
+  "rust-analyzer.lens.enable": true,
+  "rust-analyzer.lens.run.enable": true,
+  "rust-analyzer.lens.debug.enable": true,
+
+  // rust-analyzerのパフォーマンス
+  "rust-analyzer.cachePriming.enable": true,
+  "rust-analyzer.procMacro.enable": true,
+
+  //===================
+  // デバッグ・テスト環境
+
+  // デバッグ設定
+  "rust-analyzer.debug.engine": "vadimcn.vscode-lldb",
+
+  // テスト実行時の環境変数
+  "terminal.integrated.env.windows": {
+    "RUST_BACKTRACE": "1"
+  },
+  "terminal.integrated.env.linux": {
+    "RUST_BACKTRACE": "1"
+  },
+  "terminal.integrated.env.osx": {
+    "RUST_BACKTRACE": "1"
+  },
+
+  // エラー表示強化
+  "problems.decorations.enabled": true,
+
+  // 補完設定（処理速度サポート）
+  "editor.suggestOnTriggerCharacters": true,
+  "editor.acceptSuggestionOnEnter": "on",
+
+  //===================
+  // パフォーマンス設定
+
+  // ファイル検索の最適化
+  "search.exclude": {
+    "**/target": true,
+    "**/Cargo.lock": true
+  },
+  "files.exclude": {
+    "**/target/debug": true,
+    "**/target/release": true
+  },
+
+  //===================
+  // Github Copilot
+  //コミットメッセージ
+  "github.copilot.chat.commitMessageGeneration.instructions": [
+    {
+      "file": ".github\\instructions\\commit-message-instructions.md"
+    }
+  ]
+}
