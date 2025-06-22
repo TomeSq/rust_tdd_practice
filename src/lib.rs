@@ -1,3 +1,5 @@
+pub mod string_calculator;
+
 #[derive(Default)]
 pub struct Calculator;
 
