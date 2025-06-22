@@ -36,6 +36,10 @@ mod tests {
 
     use crate::Calculator;
 
+    fn setup_calculator() -> Calculator {
+        Calculator::new()
+    }
+
     #[test]
     fn 計算機が作成できること() {
         // Arrange
@@ -53,7 +57,7 @@ mod tests {
     #[test]
     fn 正の数同士を足し算できること() {
         // Arrange
-        let calc = Calculator::new();
+        let calc = setup_calculator();
 
         // Act
         let result = calc.add(2, 3);
@@ -65,7 +69,7 @@ mod tests {
     #[test]
     fn 負の数同士を足し算できること() {
         // Arrange
-        let calc = Calculator::new();
+        let calc = setup_calculator();
 
         // Act
         let result = calc.add(-2, -3);
@@ -77,7 +81,7 @@ mod tests {
     #[test]
     fn 正負混合の数を足し算できること() {
         // Arrange
-        let calc = Calculator::new();
+        let calc = setup_calculator();
 
         // Act
         let result = calc.add(-5, 3);
@@ -92,7 +96,7 @@ mod tests {
     #[test]
     fn 正の数同士を引き算できること() {
         // Arrange
-        let calc = Calculator::new();
+        let calc = setup_calculator();
 
         // Act
         let result = calc.subtract(5, 3);
@@ -104,7 +108,7 @@ mod tests {
     #[test]
     fn 負の数同士を引き算できること() {
         // Arrange
-        let calc = Calculator::new();
+        let calc = setup_calculator();
 
         // Act
         let result = calc.subtract(5, -3);
@@ -119,7 +123,7 @@ mod tests {
     #[test]
     fn 正の数同士を掛け算できること() {
         // Arrange
-        let calc = Calculator::new();
+        let calc = setup_calculator();
 
         // Act
         let result = calc.multiply(4, 3);
@@ -131,7 +135,7 @@ mod tests {
     #[test]
     fn ゼロを掛け算できること() {
         // Arrange
-        let calc = Calculator::new();
+        let calc = setup_calculator();
 
         // Act
         let result = calc.multiply(5, 0);
@@ -143,7 +147,7 @@ mod tests {
     #[test]
     fn 負の数を掛け算できること() {
         // Arrange
-        let calc = Calculator::new();
+        let calc = setup_calculator();
 
         // Act
         let result = calc.multiply(-3, 4);
@@ -158,7 +162,7 @@ mod tests {
     #[test]
     fn 正の数同士を割り算できること() {
         // Arrange
-        let calc = Calculator::new();
+        let calc = setup_calculator();
 
         // Act
         let result = calc.divide(10, 2);
@@ -170,7 +174,7 @@ mod tests {
     #[test]
     fn 割り切れない数を割り算できること() {
         // Arrange
-        let calc = Calculator::new();
+        let calc = setup_calculator();
 
         // Act
         let result = calc.divide(7, 3);
@@ -186,7 +190,7 @@ mod tests {
     #[test]
     fn ゼロ除算でエラーを返すこと() {
         // Arrange
-        let calc = Calculator::new();
+        let calc = setup_calculator();
 
         // Act
         let result = calc.divide(5, 0);
