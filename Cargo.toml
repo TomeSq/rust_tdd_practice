@@ -1,6 +1,8 @@
-[package]
-name = "calculator"
-version = "0.1.0"
-edition = "2024"
+[workspace]
+members = ["calculator"]
 
-[dependencies]
+# 将来的に共通で使う可能性のある依存関係
+[workspace.dependencies]
+serde = { version = "1.0", features = ["derive"] }
+clap = { version = "4.0" }
+tokio = { version = "1.0", features = ["full"] }
