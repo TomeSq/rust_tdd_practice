@@ -64,7 +64,7 @@ mod tests {
         // Act
         let result = calc.add(2, 3);
 
-        // Asesrt
+        // Assert
         assert_eq!(result, 5);
     }
 
@@ -76,7 +76,7 @@ mod tests {
         // Act
         let result = calc.add(-2, -3);
 
-        // Asesrt
+        // Assert
         assert_eq!(result, -5);
     }
 
@@ -88,7 +88,7 @@ mod tests {
         // Act
         let result = calc.add(-5, 3);
 
-        // Asesrt
+        // Assert
         assert_eq!(result, -2);
     }
 
@@ -103,7 +103,7 @@ mod tests {
         // Act
         let result = calc.subtract(5, 3);
 
-        // Asesrt
+        // Assert
         assert_eq!(result, 2);
     }
 
@@ -115,7 +115,7 @@ mod tests {
         // Act
         let result = calc.subtract(5, -3);
 
-        // Asesrt
+        // Assert
         assert_eq!(result, 8);
     }
 
@@ -130,7 +130,7 @@ mod tests {
         // Act
         let result = calc.multiply(4, 3);
 
-        // Asesrt
+        // Assert
         assert_eq!(result, 12);
     }
 
@@ -142,7 +142,7 @@ mod tests {
         // Act
         let result = calc.multiply(5, 0);
 
-        // Asesrt
+        // Assert
         assert_eq!(result, 0);
     }
 
@@ -154,7 +154,7 @@ mod tests {
         // Act
         let result = calc.multiply(-3, 4);
 
-        // Asesrt
+        // Assert
         assert_eq!(result, -12);
     }
 
@@ -169,7 +169,7 @@ mod tests {
         // Act
         let result = calc.divide(10, 2);
 
-        // Asesrt
+        // Assert
         assert_eq!(result, Ok(5.0));
     }
 
@@ -181,7 +181,7 @@ mod tests {
         // Act
         let result = calc.divide(7, 3);
 
-        // Asesrt
+        // Assert
         // f64の比較では誤差を考慮
         match result {
             Ok(v) => assert!((v - 2.3333).abs() < 0.0001),
@@ -197,7 +197,7 @@ mod tests {
         // Act
         let result = calc.divide(5, 0);
 
-        // Asesrt
+        // Assert
         assert!(result.is_err());
         assert_eq!(result.unwrap_err(), "ゼロで割ることはできません");
     }
