@@ -34,8 +34,6 @@ impl Calculator {
 
 #[cfg(test)]
 mod tests {
-    //    use super::*;
-
     use crate::Calculator;
 
     fn setup_calculator() -> Calculator {
