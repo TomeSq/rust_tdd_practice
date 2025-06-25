@@ -53,7 +53,7 @@ impl Book {
     }
 } //impl Book
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Library {
     books: Vec<Book>,
 }
@@ -64,11 +64,18 @@ impl Library {
     }
 
     pub fn add_book(&mut self, book: Book) -> Result<(), LibrartyError> {
-        todo!("TDDで実装してください");
+        // ISBNが重複している場合はエラーを返す
+        if self.books.iter().any(|b| b.isbn == book.isbn) {
+            return Err(LibrartyError::BookAlreadyBorrowed(book.isbn.clone()));
+        }
+
+        // 本を追加する
+        self.books.push(book.clone());
+        Ok(())
     }
 
     pub fn find_book(&mut self, isbn: &str) -> Option<&Book> {
-        todo!("TDDで実装してください");
+        self.books.iter().find(|b| b.isbn == isbn)
     }
 
     pub fn borrow_book(&mut self, isbn: &str) -> Result<(), LibrartyError> {
@@ -84,7 +91,7 @@ impl Library {
     }
 
     pub fn book_count(&self) -> usize {
-        todo!("TDDで実装してください");
+        self.books.len()
     }
 } //impl Library
 
@@ -202,5 +209,106 @@ mod tests {
             result.unwrap_err(),
             LibrartyError::BookNotBorrowed(book.isbn.clone())
         );
+    }
+
+    // =========================
+    // Library構造体のテスト
+    // =========================
+    #[test]
+    fn 図書館を作成できること() {
+        // Arrange & Act
+        let library = setup_library();
+
+        // Assert
+        assert_eq!(library.book_count(), 0);
+    }
+
+    #[test]
+    fn 図書館に本を追加できること() {
+        // Arrange
+        let mut library = setup_library();
+        let book = create_test_book();
+
+        // Act
+        let result = library.add_book(book.clone());
+
+        // Assert
+        assert!(result.is_ok());
+        assert_eq!(library.book_count(), 1);
+    }
+
+    #[test]
+    #[allow(non_snake_case)]
+    fn 同じISBNの本は追加できないこと() {
+        // Arrange
+        let mut library = setup_library();
+        let book1 = create_test_book();
+        let book2 = create_test_book(); // 同じ本を再度追加
+        library.add_book(book1).unwrap(); // 最初の追加は成功
+
+        // Act
+        let result = library.add_book(book2); // 2回目の追加はエラー
+
+        // Assert
+        assert!(result.is_err());
+        assert_eq!(library.book_count(), 1);
+        assert_eq!(
+            result.unwrap_err(),
+            LibrartyError::BookAlreadyBorrowed("978-4-06-519465-6".to_string())
+        );
+    }
+
+    #[test]
+    #[allow(non_snake_case)]
+    fn ISBNで本を検索できること() {
+        // Arrange
+        let mut library = setup_library();
+        let book = create_test_book();
+        library.add_book(book.clone()).unwrap();
+
+        // Act
+        let found_book = library.find_book(&book.isbn);
+
+        // Assert
+        assert!(found_book.is_some());
+        assert_eq!(found_book.unwrap(), &book);
+    }
+
+    #[test]
+    fn 存在しない本は検索できないこと() {
+        // Arrange
+        let mut library = setup_library();
+
+        // Act
+        let found_book = library.find_book("978-4-06-519465-6");
+
+        // Assert
+        assert!(found_book.is_none());
+    }
+
+    #[test]
+    fn 利用可能な本の一覧を取得できること() {
+        // Arrange
+        let mut library = setup_library();
+        let mut book1 = create_test_book();
+        let book2 = Book::new(
+            "978-4-06-519466-6".to_string(),
+            "別な本".to_string(),
+            "別の著者".to_string(),
+        )
+        .unwrap();
+
+        book1.borrow_book().unwrap(); // book1を貸出中にする
+
+        // 図書館に本を追加
+        library.add_book(book1).unwrap();
+        library.add_book(book2).unwrap();
+
+        // Act
+        let available_books = library.list_available_books();
+
+        // Assert
+        assert_eq!(available_books.len(), 1);
+        assert_eq!(available_books[0].isbn, "978-4-06-519466-6");
     }
 }
