@@ -78,16 +78,8 @@ impl Library {
         self.books.iter().find(|b| b.isbn == isbn)
     }
 
-    pub fn borrow_book(&mut self, isbn: &str) -> Result<(), LibrartyError> {
-        todo!("TDDで実装してください");
-    }
-
-    pub fn return_book(&mut self, isbn: &str) -> Result<(), LibrartyError> {
-        todo!("TDDで実装してください");
-    }
-
     pub fn list_available_books(&self) -> Vec<&Book> {
-        todo!("TDDで実装してください");
+        self.books.iter().filter(|b| !b.is_borrowd).collect()
     }
 
     pub fn book_count(&self) -> usize {
