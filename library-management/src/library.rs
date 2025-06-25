@@ -1,9 +1,10 @@
 #[derive(Debug, PartialEq)]
-pub enum LibrartyError {
+pub enum LibraryError {
     BookNotFound(String),
     BookAlreadyBorrowed(String),
     BookNotBorrowed(String),
     InvalidIsbn(String),
+    BookAlreadyExists(String),
 }
 
 // 本の情報を示す構造体
@@ -12,43 +13,43 @@ pub struct Book {
     pub isbn: String,
     pub title: String,
     pub author: String,
-    pub is_borrowd: bool,
+    pub is_borrowed: bool,
 }
 
 impl Book {
-    pub fn new(isbn: String, title: String, author: String) -> Result<Self, LibrartyError> {
+    pub fn new(isbn: String, title: String, author: String) -> Result<Self, LibraryError> {
         // ISBNの形式をチェック
         if isbn.is_empty() || isbn.len() < 10 {
-            return Err(LibrartyError::InvalidIsbn(isbn));
+            return Err(LibraryError::InvalidIsbn(isbn));
         }
 
         Ok(Book {
             isbn,
             title,
             author,
-            is_borrowd: false,
+            is_borrowed: false,
         })
     }
 
-    pub fn borrow_book(&mut self) -> Result<(), LibrartyError> {
+    pub fn borrow_book(&mut self) -> Result<(), LibraryError> {
         //既に貸出中なら貸出中のエラーを返す
-        if self.is_borrowd {
-            return Err(LibrartyError::BookAlreadyBorrowed(self.isbn.clone()));
+        if self.is_borrowed {
+            return Err(LibraryError::BookAlreadyBorrowed(self.isbn.clone()));
         }
 
         //貸出中でなければ貸出を行う
-        self.is_borrowd = true;
+        self.is_borrowed = true;
         Ok(())
     }
 
-    pub fn return_book(&mut self) -> Result<(), LibrartyError> {
+    pub fn return_book(&mut self) -> Result<(), LibraryError> {
         //貸出中でなければ返却できないエラーを返す
-        if !self.is_borrowd {
-            return Err(LibrartyError::BookNotBorrowed(self.isbn.clone()));
+        if !self.is_borrowed {
+            return Err(LibraryError::BookNotBorrowed(self.isbn.clone()));
         }
 
         //貸出中であれば返却を行う
-        self.is_borrowd = false;
+        self.is_borrowed = false;
         Ok(())
     }
 } //impl Book
@@ -63,14 +64,14 @@ impl Library {
         Library { books: Vec::new() }
     }
 
-    pub fn add_book(&mut self, book: Book) -> Result<(), LibrartyError> {
+    pub fn add_book(&mut self, book: Book) -> Result<(), LibraryError> {
         // ISBNが重複している場合はエラーを返す
         if self.books.iter().any(|b| b.isbn == book.isbn) {
-            return Err(LibrartyError::BookAlreadyBorrowed(book.isbn.clone()));
+            return Err(LibraryError::BookAlreadyExists(book.isbn.clone()));
         }
 
         // 本を追加する
-        self.books.push(book.clone());
+        self.books.push(book);
         Ok(())
     }
 
@@ -79,7 +80,7 @@ impl Library {
     }
 
     pub fn list_available_books(&self) -> Vec<&Book> {
-        self.books.iter().filter(|b| !b.is_borrowd).collect()
+        self.books.iter().filter(|b| !b.is_borrowed).collect()
     }
 
     pub fn book_count(&self) -> usize {
@@ -122,7 +123,7 @@ mod tests {
         assert_eq!(book.isbn, "978-4-06-519465-6");
         assert_eq!(book.title, "Rustプログラミング入門");
         assert_eq!(book.author, "山田太郎");
-        assert!(!book.is_borrowd);
+        assert!(!book.is_borrowed);
     }
 
     #[test]
@@ -139,7 +140,7 @@ mod tests {
         assert!(book.is_err());
         assert_eq!(
             book.unwrap_err(),
-            LibrartyError::InvalidIsbn("123".to_string())
+            LibraryError::InvalidIsbn("123".to_string())
         );
     }
 
@@ -153,7 +154,7 @@ mod tests {
 
         // Assert
         assert!(result.is_ok());
-        assert!(book.is_borrowd);
+        assert!(book.is_borrowed);
     }
 
     #[test]
@@ -169,7 +170,7 @@ mod tests {
         assert!(result.is_err());
         assert_eq!(
             result.unwrap_err(),
-            LibrartyError::BookAlreadyBorrowed(book.isbn.clone())
+            LibraryError::BookAlreadyBorrowed(book.isbn.clone())
         );
     }
 
@@ -184,7 +185,7 @@ mod tests {
 
         // Assert
         assert!(result.is_ok());
-        assert!(!book.is_borrowd);
+        assert!(!book.is_borrowed);
     }
 
     #[test]
@@ -199,7 +200,7 @@ mod tests {
         assert!(result.is_err());
         assert_eq!(
             result.unwrap_err(),
-            LibrartyError::BookNotBorrowed(book.isbn.clone())
+            LibraryError::BookNotBorrowed(book.isbn.clone())
         );
     }
 
@@ -246,7 +247,7 @@ mod tests {
         assert_eq!(library.book_count(), 1);
         assert_eq!(
             result.unwrap_err(),
-            LibrartyError::BookAlreadyBorrowed("978-4-06-519465-6".to_string())
+            LibraryError::BookAlreadyExists("978-4-06-519465-6".to_string())
         );
     }
 
