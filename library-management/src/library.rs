@@ -75,8 +75,12 @@ impl Library {
         Ok(())
     }
 
+    fn find_book_mut(&mut self, isbn: &str) -> Option<&mut Book> {
+        self.books.iter_mut().find(|b| b.isbn == isbn)
+    }
+
     pub fn find_book(&mut self, isbn: &str) -> Option<&Book> {
-        self.books.iter().find(|b| b.isbn == isbn)
+        self.find_book_mut(isbn).map(|b| &*b)
     }
 
     pub fn list_available_books(&self) -> Vec<&Book> {
@@ -85,6 +89,32 @@ impl Library {
 
     pub fn book_count(&self) -> usize {
         self.books.len()
+    }
+
+    // 本を借りる
+    pub fn borrow_book(&mut self, isbn: &str) -> Result<(), LibraryError> {
+        // ISBNで本を検索
+        let book = self.find_book_mut(isbn);
+        match book {
+            Some(b) => {
+                b.is_borrowed = true; // 本を借りる
+                Ok(())
+            }
+            None => Err(LibraryError::BookNotFound(isbn.to_string())),
+        }
+    }
+
+    // 図書館に本を返す
+    pub fn return_book(&mut self, isbn: &str) -> Result<(), LibraryError> {
+        // ISBNで借りている本だけを取得する
+        let book = self.find_book_mut(isbn).filter(|b| b.is_borrowed);
+        match book {
+            Some(b) => {
+                b.is_borrowed = false; // 本を返す
+                Ok(())
+            }
+            None => Err(LibraryError::BookNotBorrowed(isbn.to_string())),
+        }
     }
 } //impl Library
 
@@ -303,5 +333,85 @@ mod tests {
         // Assert
         assert_eq!(available_books.len(), 1);
         assert_eq!(available_books[0].isbn, "978-4-06-519466-6");
+    }
+
+    #[test]
+    fn 図書館経由で本を借りることができること() {
+        // Arrange
+        let mut library = setup_library();
+        let book = create_test_book();
+        let isbn = book.isbn.clone();
+        library.add_book(book).unwrap();
+
+        // Act
+        let result = library.borrow_book(&isbn);
+
+        // Assert
+        assert!(result.is_ok());
+        let found_book = library.find_book(&isbn).unwrap();
+        assert!(found_book.is_borrowed);
+    }
+
+    #[test]
+    fn 存在しない本は借りることができないこと() {
+        let mut library = setup_library();
+
+        let result = library.borrow_book("存在しないISBN");
+
+        assert!(result.is_err());
+        assert_eq!(
+            result.unwrap_err(),
+            LibraryError::BookNotFound("存在しないISBN".to_string())
+        );
+    }
+
+    #[test]
+    fn 借りている本を図書館へ返すことができること() {
+        // Arrange
+        let mut library = setup_library();
+        let book = create_test_book();
+        let isbn = book.isbn.clone();
+        library.add_book(book).unwrap();
+        library.borrow_book(&isbn).unwrap(); // 本を借りる
+
+        // Act
+        let result = library.return_book(&isbn);
+
+        // Assert
+        assert!(result.is_ok());
+        let found_book = library.find_book(&isbn).unwrap();
+        assert!(!found_book.is_borrowed);
+    }
+
+    #[test]
+    fn 借りていない本を図書館へ返すことができないこと() {
+        // Arrange
+        let mut library = setup_library();
+        let book = create_test_book();
+        let isbn = book.isbn.clone();
+        library.add_book(book).unwrap();
+
+        // Act
+        let result = library.return_book(&isbn);
+
+        // Assert
+        assert!(result.is_err());
+        assert_eq!(
+            result.unwrap_err(),
+            LibraryError::BookNotBorrowed(isbn.to_string())
+        );
+    }
+
+    #[test]
+    fn 存在しない本は返すことができないこと() {
+        let mut library = setup_library();
+
+        let result = library.return_book("存在しないISBN");
+
+        assert!(result.is_err());
+        assert_eq!(
+            result.unwrap_err(),
+            LibraryError::BookNotBorrowed("存在しないISBN".to_string())
+        );
     }
 }
